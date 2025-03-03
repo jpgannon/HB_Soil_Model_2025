@@ -1,9 +1,9 @@
-library(devtools)
-install_version("maptools", version = "1.1-8", repos = "http://cran.us.r-project.org")
-install_github("envirometrix/landmap")
+#library(devtools)
+#install_version("maptools", version = "1.1-8", repos = "http://cran.us.r-project.org")
+#install_github("envirometrix/landmap")
 
-url <- "https://download.r-forge.r-project.org/src/contrib/rgdal_1.6-7.tar.gz"
-install.packages(url, type="source", repos=NULL)
+#url <- "https://download.r-forge.r-project.org/src/contrib/rgdal_1.6-7.tar.gz"
+#install.packages(url, type="source", repos=NULL)
 
 #Load topo metric packages
 set.seed(100)
@@ -28,24 +28,20 @@ library(rpart)
 library(nnet)
 library(tmap)
 
-data_dir <- "mosaic_HB_CP_BP/"
+data_dir <- "Output/"
+model_out_dir <- "Soil_Model_Output/"
 
 #Add raster files (always from the main project folder otherwise things start to fail)
-hbmaxslope <- raster(paste0(data_dir,"slope_per_qgis.tif"))
-hbuaab     <- raster(paste0(data_dir,"uaab_norm2.tif")) #bad
-twid       <- raster(paste0(data_dir,"hydem5m_TWId.tif")) #twi, check
-mrvbf      <- raster(paste0(data_dir,"mrvbf.tif")) #check
-tpi20      <- raster(paste0(data_dir,"tpi20saga.tif"))
-tpi100     <- raster(paste0(data_dir,"tpi100saga.tif"))
-tpi200     <- raster(paste0(data_dir,"tpi200saga.tif"))
-#tpi500     <- raster(paste0(data_dir,"tpi500saga.tif"))
-#tpi2000    <- raster(paste0(data_dir,"tpi2000saga.tif"))
-EDb        <- raster(paste0(data_dir, "EDb.tif"))
-#hbedbgam45 <- raster(paste0(data_dir,"hbedbgam45rec.tif"))
-#bedrock    <- raster(paste0(data_dir, "bossBRprediction.tif"))
+hbmaxslope <- raster(paste0(out_dir,"slope_per_qgis.tif"))
+hbuaab     <- raster(paste0(out_dir,"uaab_norm2.tif")) #bad
+twid       <- raster(paste0(out_dir,"hydem5m_TWId.tif")) #twi, check
+mrvbf      <- raster(paste0(out_dir,"mrvbf.tif")) #check
+tpi20      <- raster(paste0(out_dir,"tpi20saga.tif"))
+tpi100     <- raster(paste0(out_dir,"tpi100saga.tif"))
+tpi200     <- raster(paste0(out_dir,"tpi200saga.tif"))
+EDb        <- raster(paste0(out_dir, "EDb.tif"))
 
-#NDVI       <- raster(paste0(data_dir,"S2aNDVI.tif"))
-#twid <- raster("hydem5m_TWId.tif")
+
 
 
 plot(hbmaxslope)
@@ -75,8 +71,6 @@ proj4string(plots) <- CRS("+init=epsg:26919")
 #crs(plots) <- "+init=epsg:26919"
 plots$hpu <- as.factor(plots$hpu)
 levels(plots$hpu)
-
-#OGbedrock <- raster("Original_Metrics/bedrock/bdr100k.tif")
 
 #check points and rasters align
 tmap_mode("view")
@@ -111,7 +105,7 @@ mC <- train.spLearner(plots["hpu"],
                       parallel = FALSE, 
                       oblique.coords = TRUE)
 
-saveRDS(mC, paste0(data_dir, "model", Sys.Date(), ".rds"))
+saveRDS(mC, paste0(model_out_dir, "model", Sys.Date(), ".rds"))
 
 # Predict. This will take a long time!
 hb.hpu <- predict(mC)
@@ -119,12 +113,9 @@ hb.hpu <- predict(mC)
 r <- raster(hb.hpu$pred, "response")
 
 writeRaster(r, 
-            paste0(data_dir, "modelout", Sys.Date(), ".tif"), 
+            paste0(model_out_dir, "modelout", Sys.Date(), ".tif"), 
             overwrite=TRUE)
 
-mC <- readRDS("HBValley/model2024-01-31.rds")
-
-test <- raster(paste0(data_dir, "Model_Verified.tif"))
 #########################################################################################################
 # CONFUSION MATRIX
 #########################################################################################################
@@ -156,11 +147,11 @@ pET <- raster(hb.hpu$pred, "prob.T")
 pEBh <- raster(hb.hpu$pred, "prob.Bh")
 pEBi <- raster(hb.hpu$pred, "prob.Bi")
 
-writeRaster(pEE,  paste0(data_dir,'prob_E_', Sys.Date(),'.tif'))
-writeRaster(pEH,  paste0(data_dir,'prob_H_', Sys.Date(),'.tif'))
-writeRaster(pEO,  paste0(data_dir,'prob_O_', Sys.Date(),'.tif'))
-writeRaster(pEI,  paste0(data_dir,'prob_I_', Sys.Date(),'.tif'))
-writeRaster(pEBhs,paste0(data_dir,'prob_Bhs_', Sys.Date(),'.tif'))
-writeRaster(pET,  paste0(data_dir,'prob_T_', Sys.Date(),'.tif'))
-writeRaster(pEBh, paste0(data_dir,'prob_Bh_', Sys.Date(),'.tif'))
-writeRaster(pEBi, paste0(data_dir,'prob_Bi_', Sys.Date(),'.tif'))
+writeRaster(pEE,  paste0(model_out_dir,'prob_E_', Sys.Date(),'.tif'))
+writeRaster(pEH,  paste0(model_out_dir,'prob_H_', Sys.Date(),'.tif'))
+writeRaster(pEO,  paste0(model_out_dir,'prob_O_', Sys.Date(),'.tif'))
+writeRaster(pEI,  paste0(model_out_dir,'prob_I_', Sys.Date(),'.tif'))
+writeRaster(pEBhs,paste0(model_out_dir,'prob_Bhs_', Sys.Date(),'.tif'))
+writeRaster(pET,  paste0(model_out_dir,'prob_T_', Sys.Date(),'.tif'))
+writeRaster(pEBh, paste0(model_out_dir,'prob_Bh_', Sys.Date(),'.tif'))
+writeRaster(pEBi, paste0(model_out_dir,'prob_Bi_', Sys.Date(),'.tif'))
