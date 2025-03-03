@@ -16,7 +16,7 @@ library(sf)
 #library(rgdal)
 library(geoR)
 #Load Ensemble Machine Learning packages
-#library(landmap) #not on CRAN, install using devtool install_github
+library(landmap) #not on CRAN, install using devtool install_github
 #library(plotKML) #not on CRAN
 library(viridis) 
 library(glmnet)
@@ -28,11 +28,10 @@ library(rpart)
 library(nnet)
 library(tmap)
 
-data_dir <- "Output/"
+out_dir <- "Output/"
 model_out_dir <- "Soil_Model_Output/"
 
 #Add raster files (always from the main project folder otherwise things start to fail)
-hbmaxslope <- raster(paste0(out_dir,"slope_per_qgis.tif"))
 hbuaab     <- raster(paste0(out_dir,"uaab_norm2.tif")) #bad
 twid       <- raster(paste0(out_dir,"hydem5m_TWId.tif")) #twi, check
 mrvbf      <- raster(paste0(out_dir,"mrvbf.tif")) #check
@@ -41,10 +40,6 @@ tpi100     <- raster(paste0(out_dir,"tpi100saga.tif"))
 tpi200     <- raster(paste0(out_dir,"tpi200saga.tif"))
 EDb        <- raster(paste0(out_dir, "EDb.tif"))
 
-
-
-
-plot(hbmaxslope)
 plot(hbuaab    )
 plot(twid      )
 plot(mrvbf     )
