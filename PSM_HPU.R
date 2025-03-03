@@ -63,7 +63,7 @@ plot(EDb       )
 
 
 # Add pedon shapefile
-plots <- st_read("HBValley/HBEF_NEW_biscuit_Pedon_LAST/HBEF_NEW_biscuit_Pedon_LAST.shp")
+plots <- st_read("Data/HBEF_NEW_biscuit_Pedon_LAST.shp")
 plots <- as.data.frame(plots)
 
 coordinates(plots) <- ~easting+northing
